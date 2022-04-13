@@ -11,42 +11,6 @@ type Props = {
 
 const data2 = [
   {
-    name: 'Page A',
-    uv: 4000,
-    pv: 2400,
-    amt: 2400,
-  },
-  {
-    name: 'Page B',
-    uv: 3000,
-    pv: 1398,
-    amt: 2210,
-  },
-  {
-    name: 'Page C',
-    uv: 2000,
-    pv: 9800,
-    amt: 2290,
-  },
-  {
-    name: 'Page D',
-    uv: 2780,
-    pv: 3908,
-    amt: 2000,
-  },
-  {
-    name: 'Page E',
-    uv: 1890,
-    pv: 4800,
-    amt: 2181,
-  },
-  {
-    name: 'Page F',
-    uv: 2390,
-    pv: 3800,
-    amt: 2500,
-  },
-  {
     name: 'Page G',
     uv: 3490,
     pv: 4300,
@@ -60,28 +24,37 @@ const WeatherHourly: React.FC<Props> = ({ setShowHourModal }) => {
 
   useEffect(() => {
     if (data?.name) {
-      getWeatherForecast(data.coord.lon, data.coord.lat)
+      getWeatherForecast(data.coord.lat, data.coord.lon)
         .then(res => {
-          console.log(res)
-          setDetailedData(res)})
+          const hourlyData = res.list.map((day: any) => {
+            return {
+              name: day.dt_txt,
+              temp: day.main.temp,
+            }
+          })
+          setDetailedData(hourlyData)
+        })
     }
-    console.log(detailedData, 'det')
   }, [data])
 
   return (
-    <div className='fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-[100vh] w-[100vw]' >
+    <div className='fixed inset-0 bg-gray-600 bg-opacity-50  h-[100vh] w-[100vw]' >
       <div className='flex justify-center items-center h-screen ' >
-        <div className='bg-white rounded text-black h-[640px] w-9/12 p-9' >
+        <div className='bg-white rounded text-black h-[540px] w-9/12 p-9' >
+          <h1>Weather detailed graph in Celcius (scroll right)</h1>
           <div className='flex justify-between' >
-            {
-              detailedData ? (
-                <div className='block' >
-                    asdasd
-                </div>
-              ) : <>Data not loaded...</>
-            }
-            <button onClick={() => setShowHourModal(false)} >Close</button>
+            <div className='overflow-auto overflow-x-scroll mt-10' >
+              <LineChart width={2000} height={200} data={detailedData}>
+                <XAxis dataKey="name" />
+                <YAxis dataKey={"temp"} />
+                <CartesianGrid strokeDasharray="3 3" />
+                <Tooltip />
+                <Legend verticalAlign="top" height={36} />
+                <Line type="monotone" dataKey="temp" stroke="#8884d8" strokeWidth={1} />
+              </LineChart>
+            </div>
           </div>
+          <button className="h-10 px-6 mt-5 font-semibold rounded-full border-slate-200 bg-violet-300 text-slate-900 hover:bg-violet-600" onClick={() => setShowHourModal(false)} >Close</button>
         </div>
       </div>
     </div>

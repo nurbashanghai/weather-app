@@ -2,17 +2,27 @@ import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { motion } from "framer-motion"
 
-import { commonSelectors } from '../../store/common';
+import { commonActions, commonSelectors } from '../../store/common';
+import { saveToLocalStorage } from '../../utils/local-storage';
+import { useActions } from '../../utils/use-actions';
 
 type Props = {
   setShowHourModal: (bool: boolean) => void
 }
 
-const WeatherCard: React.FC<Props> = ({setShowHourModal}) => {
+const WeatherCard: React.FC<Props> = ({ setShowHourModal }) => {
   const data = useSelector(commonSelectors.data);
-  useEffect(() => {
-    console.log(data)
-  }, [data])
+  const listData = useSelector(commonSelectors.listData);
+  const { getSavedCities } = useActions(commonActions);
+
+  const saveCity = () => {
+    // checking if choosed city exists in saved list
+    if (!listData.find((city: any) => city.name === data.name)) {
+      let arr = [...listData, data];
+      saveToLocalStorage(arr);
+      getSavedCities()
+    }
+  }
 
   return (
     <figure className="bg-slate-100 p-8 dark:bg-slate-800 w-[320px] rounded">
@@ -48,7 +58,7 @@ const WeatherCard: React.FC<Props> = ({setShowHourModal}) => {
             <button onClick={() => setShowHourModal(true)} className="h-10 px-6 mt-5 font-semibold rounded-full border-slate-200 bg-violet-300 text-slate-900 hover:bg-violet-600" type="button">
               Get Hourly Forecast
             </button>
-            <button className="h-10 px-6 mt-5 font-semibold rounded-full border-slate-200 bg-violet-300 text-slate-900 hover:bg-violet-600" type="button">
+            <button onClick={saveCity} className="h-10 px-6 mt-5 font-semibold rounded-full border-slate-200 bg-violet-300 text-slate-900 hover:bg-violet-600" type="button">
               Save
             </button>
           </motion.div>

@@ -1,12 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Container } from '@mui/material';
 
 import List from '../list/list';
 import WeatherCard from '../weather-card/weather-card';
 import './style.modules.css';
 import WeatherHourly from '../weather-card/weather-hourly';
+import { useActions } from '../../utils/use-actions';
+import { commonActions } from '../../store/common';
 
 const MainPage = () => {
+  const { getSavedCities } = useActions(commonActions);
+  useEffect(() => {
+    getSavedCities()
+  },[])
   const [showHourModal, setShowHourModal] = useState(false);
   return (
     <div>

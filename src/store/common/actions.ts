@@ -19,8 +19,6 @@ export const getSavedCities = () =>
     const savedCities = getFromLocalStorage();
     dispatch(setSavedCitiesToState(savedCities));
   }
-  
-
 
 export const setWeatherToState = (payload: any) => {
   return { type: types.SET_DATA, payload }

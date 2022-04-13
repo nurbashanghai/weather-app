@@ -1,57 +1,54 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { useSelector } from 'react-redux';
+import { refreshCityWeather } from '../../api/requests';
+import { commonActions, commonSelectors } from '../../store/common';
+import { saveToLocalStorage } from '../../utils/local-storage';
+import { useActions } from '../../utils/use-actions';
 
 type Props = {
-  city: any
+  location: any
 }
 
-const ListItem: React.FC<Props> = ({ city }: any) => {
+const ListItem: React.FC<Props> = ({ location }: any) => {
+  const [city, setCity] = useState(location)
+  const [loading, setLoading] = useState(false)
+  const listData = useSelector(commonSelectors.listData);
+  const { getSavedCities } = useActions(commonActions);
+  const { getWeatherAction } = useActions(commonActions)
+  const removeCity = () => {
+    const arr = listData.filter((item: any) => item.name !== city.name)
+    saveToLocalStorage(arr)
+    getSavedCities()
+  }
+
+  const refreshWeather = async (e: any) => {
+    e.stopPropagation()
+    setLoading(true)
+    const res = await refreshCityWeather(city.name)
+    setCity(res.data)
+    setLoading(false)
+  }
+
+  const chooseCityToDisplay = () => {
+    getWeatherAction(city.name)
+  }
+
   return (
-    <article className="flex items-start space-x-6 p-6">
-      <img src={city.image} alt="" width="60" height="88" className="flex-none rounded-md bg-slate-100" />
+    <article onClick={chooseCityToDisplay} className="flex items-start text-white space-x-6 p-6 hover:bg-blue-500 hover:ring-blue-500 hover:shadow-md group rounded-md p-3 bg-slate-800 ring-1 ring-slate-200 shadow-sm">
+      <img src={`http://openweathermap.org/img/wn/${city.weather[0].icon}@2x.png`} alt="" width="60" height="88" />
       <div className="min-w-0 relative flex-auto">
-        <h2 className="font-semibold text-slate-900 truncate pr-20">{city.title}</h2>
+        <h2 className="font-semibold text-white truncate pr-20">{city.name}</h2>
         <dl className="mt-2 flex flex-wrap text-sm leading-6 font-medium">
-          <div className="absolute top-0 right-0 flex items-center space-x-1">
-            <dt className="text-sky-500">
-              <span className="sr-only">Star rating</span>
-              <svg width="16" height="20" fill="currentColor">
-                <path d="M7.05 3.691c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.372 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.539 1.118l-2.8-2.034a1 1 0 00-1.176 0l-2.8 2.034c-.783.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.363-1.118L.98 9.483c-.784-.57-.381-1.81.587-1.81H5.03a1 1 0 00.95-.69L7.05 3.69z" />
-              </svg>
-            </dt>
+          <div onClick={removeCity} className="absolute top-6 hover:bg-red-600 rounded p-1 right-0 flex items-center space-x-1 cursor-pointer">
             <dd>remove</dd>
           </div>
-          <div>
-            <dt className="sr-only">Temperature</dt>
-            <dd className="px-1.5 ring-1 ring-slate-200 rounded">{city.temp}</dd>
-          </div>
-          <div className="ml-2">
-            <dt className="sr-only">Year</dt>
-            <dd>{city.year}</dd>
-          </div>
-          <div>
-            <dt className="sr-only">Genre</dt>
-            <dd className="flex items-center">
-              <svg width="2" height="2" fill="currentColor" className="mx-2 text-slate-300" aria-hidden="true">
-                <circle cx="1" cy="1" r="1" />
-              </svg>
-              {city.genre}
-            </dd>
-          </div>
-          <div>
-            <dt className="sr-only">Runtime</dt>
-            <dd className="flex items-center">
-              <svg width="2" height="2" fill="currentColor" className="mx-2 text-slate-300" aria-hidden="true">
-                <circle cx="1" cy="1" r="1" />
-              </svg>
-              {city.runtime}
-            </dd>
-          </div>
-          <div className="flex-none w-full mt-2 font-normal">
-            <dt className="sr-only">Cast</dt>
-            <dd className="text-slate-400">{city.cast}</dd>
-          </div>
         </dl>
+        <div>{city.main.temp} Celcius</div>
+        <div>{city.weather[0].main}</div>
       </div>
+      <button disabled={loading} onClick={refreshWeather} className="h-10 px-6 mt-5 font-semibold rounded-full border-slate-200 bg-violet-300 text-slate-900 hover:bg-violet-600 cursor-pointer">
+        {loading ? 'refreshing...' : 'refresh'} 
+      </button>
     </article>
   )
 }
