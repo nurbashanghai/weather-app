@@ -1,0 +1,3 @@
+export const SET_DATA = "SET_DATA"
+export const SET_LOADING_TRUE = "SET_LOADING_TRUE"
+export const SET_SAVED_CITIES = "SET_SAVED_CITIES"

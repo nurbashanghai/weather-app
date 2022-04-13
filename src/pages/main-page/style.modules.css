@@ -1,0 +1,7 @@
+.rightside-bg{
+  background-image: url(/src/assets/bg-image.jpg);
+  background-size: cover;
+  height: 95vh;
+  color: white;
+  border-radius: 0px 10px 10px 0px;
+}
