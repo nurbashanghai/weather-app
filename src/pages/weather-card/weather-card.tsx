@@ -49,7 +49,7 @@ const WeatherCard: React.FC<Props> = ({ setShowHourModal }) => {
                 {`feels like ${data?.main?.feels_like} celcius`}
               </div>
               <div className="text-white">
-                {`feels like ${data?.main?.humidity}% humidity`}
+                {`${data?.main?.humidity}% humidity`}
               </div>
               <div className="text-white">
                 {`pressure ${data?.main?.pressure} `}
